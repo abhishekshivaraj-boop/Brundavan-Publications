@@ -10,14 +10,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/orders")
 @CrossOrigin(
-    origins = {
-        "http://localhost:5174",
-        "http://localhost:5175"
-    }
+        origins = {
+                "http://localhost:5174",
+                "http://localhost:5175"
+        }
 )
 public class OrderController {
 
@@ -102,5 +103,119 @@ public class OrderController {
                 orderRepository.findAll();
 
         return ResponseEntity.ok(orders);
+    }
+
+    // =========================
+    // UPDATE PAYMENT STATUS
+    // =========================
+
+    @PutMapping("/{id}/payment-status")
+    public ResponseEntity<?> updatePaymentStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body
+    ) {
+
+        Order order = orderRepository
+                .findById(id)
+                .orElse(null);
+
+        if (order == null) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Order not found.");
+        }
+
+        String status =
+                body.get("status");
+
+        if (status == null || status.isBlank()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Payment status is required.");
+        }
+
+        try {
+            Order.PaymentStatus paymentStatus =
+                    Order.PaymentStatus.valueOf(
+                            status.toUpperCase()
+                    );
+
+            order.setPaymentStatus(
+                    paymentStatus
+            );
+
+            Order updatedOrder =
+                    orderRepository.save(order);
+
+            return ResponseEntity.ok(
+                    updatedOrder
+            );
+
+        } catch (IllegalArgumentException ex) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(
+                            "Invalid payment status. " +
+                            "Use PENDING, PAID or FAILED."
+                    );
+        }
+    }
+
+    // =========================
+    // UPDATE ORDER STATUS
+    // =========================
+
+    @PutMapping("/{id}/status")
+    public ResponseEntity<?> updateOrderStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> body
+    ) {
+
+        Order order = orderRepository
+                .findById(id)
+                .orElse(null);
+
+        if (order == null) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Order not found.");
+        }
+
+        String status =
+                body.get("status");
+
+        if (status == null || status.isBlank()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Order status is required.");
+        }
+
+        try {
+            Order.OrderStatus orderStatus =
+                    Order.OrderStatus.valueOf(
+                            status.toUpperCase()
+                    );
+
+            order.setOrderStatus(
+                    orderStatus
+            );
+
+            Order updatedOrder =
+                    orderRepository.save(order);
+
+            return ResponseEntity.ok(
+                    updatedOrder
+            );
+
+        } catch (IllegalArgumentException ex) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(
+                            "Invalid order status. " +
+                            "Use PLACED, PROCESSING, SHIPPED or DELIVERED."
+                    );
+        }
     }
 }
