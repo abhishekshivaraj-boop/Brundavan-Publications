@@ -1,0 +1,71 @@
+# =========================
+# Node / Vite
+# =========================
+
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# =========================
+# Java / Maven
+# =========================
+
+**/target/
+**/.mvn/timing.properties
+**/dependency-reduced-pom.xml
+
+# =========================
+# Spring / Environment
+# Local Spring configuration with secrets
+**/src/main/resources/application.properties
+# =========================
+
+**/.env
+**/.env.*
+!**/.env.example
+
+# Keep local Spring configuration out of Git
+**/application-local.properties
+**/application-local.yml
+
+# =========================
+# IDE
+# =========================
+
+.vscode/*
+!.vscode/extensions.json
+
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# =========================
+# OS
+# =========================
+
+.DS_Store
+Thumbs.db
+
+# =========================
+# Logs
+# =========================
+
+logs/
+*.log
+
+# =========================
+# Temporary files
+# =========================
+
+*.tmp
+*.temp
+*.swp
+*.swo

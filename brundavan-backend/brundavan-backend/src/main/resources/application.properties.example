@@ -1,0 +1,12 @@
+spring.application.name=brundavan-backend
+
+spring.datasource.url=jdbc:mysql://127.0.0.1:3306/brundavan_db?useSSL=false&serverTimezone=Asia/Kolkata
+spring.datasource.username=YOUR_DB_USERNAME
+spring.datasource.password=YOUR_DB_PASSWORD
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+
+server.port=8081
