@@ -38,22 +38,38 @@ public class OrderController {
     // =========================
 
     @PostMapping
-    public ResponseEntity<Order> createOrder(
+    public ResponseEntity<?> createOrder(
             @RequestBody Order order
     ) {
 
         if (order.getOrderItems() == null ||
                 order.getOrderItems().isEmpty()) {
 
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity
+                    .badRequest()
+                    .body("Order must contain at least one item.");
         }
 
+        /*
+         * Validate every item and stock before
+         * saving anything.
+         */
         for (OrderItem item : order.getOrderItems()) {
 
             if (item.getBook() == null ||
                     item.getBook().getId() == null) {
 
-                return ResponseEntity.badRequest().build();
+                return ResponseEntity
+                        .badRequest()
+                        .body("Each order item must contain a book ID.");
+            }
+
+            if (item.getQuantity() == null ||
+                    item.getQuantity() <= 0) {
+
+                return ResponseEntity
+                        .badRequest()
+                        .body("Order quantity must be greater than zero.");
             }
 
             Book book = bookRepository
@@ -61,8 +77,57 @@ public class OrderController {
                     .orElse(null);
 
             if (book == null) {
-                return ResponseEntity.badRequest().build();
+
+                return ResponseEntity
+                        .badRequest()
+                        .body(
+                                "Book not found: " +
+                                item.getBook().getId()
+                        );
             }
+
+            Integer currentStock = book.getStock();
+
+            if (currentStock == null) {
+                currentStock = 0;
+            }
+
+            int requestedQuantity =
+                    item.getQuantity();
+
+            if (currentStock < requestedQuantity) {
+
+                return ResponseEntity
+                        .status(HttpStatus.CONFLICT)
+                        .body(
+                                "Insufficient stock for \"" +
+                                book.getTitle() +
+                                "\". Available: " +
+                                currentStock +
+                                ", requested: " +
+                                requestedQuantity
+                        );
+            }
+        }
+
+        /*
+         * Stock validation passed for every item.
+         * Now update the actual Book references
+         * and reduce stock.
+         */
+        for (OrderItem item : order.getOrderItems()) {
+
+            Book book = bookRepository
+                    .findById(item.getBook().getId())
+                    .orElseThrow();
+
+            int newStock =
+                    book.getStock() -
+                    item.getQuantity();
+
+            book.setStock(newStock);
+
+            bookRepository.save(book);
 
             item.setBook(book);
             item.setOrder(order);
@@ -125,8 +190,7 @@ public class OrderController {
                     .body("Order not found.");
         }
 
-        String status =
-                body.get("status");
+        String status = body.get("status");
 
         if (status == null || status.isBlank()) {
             return ResponseEntity
@@ -135,6 +199,7 @@ public class OrderController {
         }
 
         try {
+
             Order.PaymentStatus paymentStatus =
                     Order.PaymentStatus.valueOf(
                             status.toUpperCase()
@@ -182,8 +247,7 @@ public class OrderController {
                     .body("Order not found.");
         }
 
-        String status =
-                body.get("status");
+        String status = body.get("status");
 
         if (status == null || status.isBlank()) {
             return ResponseEntity
@@ -192,6 +256,7 @@ public class OrderController {
         }
 
         try {
+
             Order.OrderStatus orderStatus =
                     Order.OrderStatus.valueOf(
                             status.toUpperCase()
