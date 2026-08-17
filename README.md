@@ -1,4 +1,17 @@
-# React + Vite
+Brundavan Publications
+├── Project overview
+├── Features
+├── Customer shopping flow
+├── Admin dashboard
+├── UPI payment system
+├── Stock management
+├── Technology stack
+├── Project structure
+├── API endpoints
+├── Local setup
+├── Environment configuration
+├── Screenshots
+└── Future improvements# React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
