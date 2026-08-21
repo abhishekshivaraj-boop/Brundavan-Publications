@@ -24,7 +24,6 @@ lerna-debug.log*
 # =========================
 # Spring / Environment
 # Local Spring configuration with secrets
-**/src/main/resources/application.properties
 # =========================
 
 **/.env
