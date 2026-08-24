@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-const API_URL = "http://localhost:8081/api";
+const API_URL = "https://brundavan-publications-production.up.railway.app/api";
 
 const PAYMENT_STATUSES = [
   "PENDING",

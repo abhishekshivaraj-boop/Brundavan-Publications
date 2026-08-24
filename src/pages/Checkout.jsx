@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import upiQR from "../assets/payment/upi-qr.png";
 
-const API_URL = "http://localhost:8081/api";
+const API_URL = "https://brundavan-publications-production.up.railway.app/api";
 
 function Checkout() {
   const navigate = useNavigate();

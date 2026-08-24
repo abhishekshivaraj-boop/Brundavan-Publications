@@ -5,7 +5,7 @@ import arithmeticImage from "../assets/books/Arithmetic.jpeg";
 import mentalAbilityImage from "../assets/books/Mental-Ability.jpeg";
 import passageImage from "../assets/books/Passage.jpeg";
 
-const API_URL = "http://localhost:8081/api";
+const API_URL = "https://brundavan-publications-production.up.railway.app/api";
 
 function Books() {
   const [books, setBooks] = useState([]);

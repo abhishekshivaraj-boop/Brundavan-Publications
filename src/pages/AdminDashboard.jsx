@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-const API_URL = "http://localhost:8081/api";
+const API_URL =
+  "https://brundavan-publications-production.up.railway.app/api";
 
 const EMPTY_FORM = {
   title: "",
@@ -16,31 +17,15 @@ const EMPTY_FORM = {
   mediums: [],
 };
 
-const MEDIUMS = [
-  "KANNADA",
-  "ENGLISH",
-  "HINDI",
-  "MARATHI",
-];
+const MEDIUMS = ["KANNADA", "ENGLISH", "HINDI", "MARATHI"];
 
 function AdminDashboard() {
   const [books, setBooks] = useState([]);
-  const [form, setForm] = useState({
-    ...EMPTY_FORM,
-    mediums: [],
-  });
-
-  const [showForm, setShowForm] =
-    useState(false);
-
-  const [editingId, setEditingId] =
-    useState(null);
-
-  const [saving, setSaving] =
-    useState(false);
-
-  const [loading, setLoading] =
-    useState(true);
+  const [form, setForm] = useState({ ...EMPTY_FORM, mediums: [] });
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchBooks();
@@ -49,20 +34,13 @@ function AdminDashboard() {
   const fetchBooks = async () => {
     try {
       setLoading(true);
-
-      const response = await fetch(
-        `${API_URL}/books`
-      );
+      const response = await fetch(`${API_URL}/books`);
 
       if (!response.ok) {
-        throw new Error(
-          "Failed to load books"
-        );
+        throw new Error("Failed to load books");
       }
 
-      const data =
-        await response.json();
-
+      const data = await response.json();
       setBooks(data);
     } catch (error) {
       console.error(error);
@@ -72,116 +50,59 @@ function AdminDashboard() {
   };
 
   const resetForm = () => {
-    setForm({
-      ...EMPTY_FORM,
-      mediums: [],
-    });
-
+    setForm({ ...EMPTY_FORM, mediums: [] });
     setEditingId(null);
     setShowForm(false);
   };
 
   const handleChange = (event) => {
-    const {
-      name,
-      value,
-      type,
-      checked,
-    } = event.target;
+    const { name, value, type, checked } = event.target;
 
     setForm((previous) => ({
       ...previous,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  const handleMediumChange =
-    (medium) => {
-      setForm((previous) => {
-        const exists =
-          previous.mediums.includes(
-            medium
-          );
+  const handleMediumChange = (medium) => {
+    setForm((previous) => {
+      const exists = previous.mediums.includes(medium);
 
-        return {
-          ...previous,
-          mediums: exists
-            ? previous.mediums.filter(
-                (item) =>
-                  item !== medium
-              )
-            : [
-                ...previous.mediums,
-                medium,
-              ],
-        };
-      });
-    };
+      return {
+        ...previous,
+        mediums: exists
+          ? previous.mediums.filter((item) => item !== medium)
+          : [...previous.mediums, medium],
+      };
+    });
+  };
 
   const calculatePrice = () => {
-    const original =
-      Number(
-        form.originalPrice || 0
-      );
+    const original = Number(form.originalPrice || 0);
+    const discount = Number(form.discountPercent || 0);
 
-    const discount =
-      Number(
-        form.discountPercent || 0
-      );
-
-    return (
-      original -
-      (original * discount) / 100
-    ).toFixed(2);
+    return (original - (original * discount) / 100).toFixed(2);
   };
 
   const startEdit = (book) => {
-    const mediums =
-      Array.isArray(book.mediums)
-        ? book.mediums
-            .map((item) =>
-              typeof item === "string"
-                ? item
-                : item?.medium
-            )
-            .filter(Boolean)
-        : [];
+    const mediums = Array.isArray(book.mediums)
+      ? book.mediums
+          .map((item) =>
+            typeof item === "string" ? item : item?.medium
+          )
+          .filter(Boolean)
+      : [];
 
     setForm({
-      title:
-        book.title || "",
-
-      description:
-        book.description || "",
-
-      originalPrice:
-        book.originalPrice ??
-        book.price ??
-        "",
-
-      discountPercent:
-        book.discountPercent ?? 0,
-
-      stock:
-        book.stock ?? "",
-
-      language:
-        book.language ||
-        "ENGLISH",
-
-      subject:
-        book.subject ||
-        "ARITHMETIC",
-
-      coverImageUrl:
-        book.coverImageUrl || "",
-
-      isActive:
-        book.isActive !== false,
-
+      title: book.title || "",
+      description: book.description || "",
+      originalPrice: book.originalPrice ?? book.price ?? "",
+      discountPercent: book.discountPercent ?? 0,
+      stock: book.stock ?? "",
+      language: book.language || "ENGLISH",
+      subject: book.subject || "ARITHMETIC",
+      coverImageUrl: book.coverImageUrl || "",
+      isActive: book.isActive !== false,
       mediums,
     });
 
@@ -189,286 +110,134 @@ function AdminDashboard() {
     setShowForm(true);
   };
 
-  const saveBook =
-    async (event) => {
-      event.preventDefault();
+  const saveBook = async (event) => {
+    event.preventDefault();
 
-      if (!form.title.trim()) {
-        alert(
-          "Please enter a title."
-        );
-        return;
-      }
+    if (!form.title.trim()) {
+      alert("Please enter a title.");
+      return;
+    }
 
-      if (!form.originalPrice) {
-        alert(
-          "Please enter original price."
-        );
-        return;
-      }
+    if (!form.originalPrice) {
+      alert("Please enter original price.");
+      return;
+    }
 
-      if (form.mediums.length === 0) {
-        alert(
-          "Please select at least one medium."
-        );
-        return;
-      }
+    if (form.mediums.length === 0) {
+      alert("Please select at least one medium.");
+      return;
+    }
 
-      const originalPrice =
-        Number(
-          form.originalPrice
-        );
+    const originalPrice = Number(form.originalPrice);
+    const discountPercent = Number(form.discountPercent || 0);
 
-      const discountPercent =
-        Number(
-          form.discountPercent || 0
-        );
+    const finalPrice =
+      originalPrice - (originalPrice * discountPercent) / 100;
 
-      const finalPrice =
-        originalPrice -
-        (originalPrice *
-          discountPercent) /
-          100;
-
-      const payload = {
-        title:
-          form.title.trim(),
-
-        description:
-          form.description.trim(),
-
-        originalPrice,
-
-        discountPercent,
-
-        price: Number(
-          finalPrice.toFixed(2)
-        ),
-
-        stock:
-          Number(form.stock),
-
-        language:
-          form.language,
-
-        subject:
-          form.subject,
-
-        coverImageUrl:
-          form.coverImageUrl.trim(),
-
-        isActive:
-          form.isActive,
-
-        mediums:
-          form.mediums.map(
-            (medium) => ({
-              medium,
-            })
-          ),
-      };
-
-      try {
-        setSaving(true);
-
-        const url =
-          editingId
-            ? `${API_URL}/books/${editingId}`
-            : `${API_URL}/books`;
-
-        const response =
-          await fetch(url, {
-            method:
-              editingId
-                ? "PUT"
-                : "POST",
-
-            headers: {
-              "Content-Type":
-                "application/json",
-            },
-
-            body:
-              JSON.stringify(
-                payload
-              ),
-          });
-
-        if (!response.ok) {
-          throw new Error(
-            await response.text()
-          );
-        }
-
-        await fetchBooks();
-        resetForm();
-
-      } catch (error) {
-        console.error(error);
-        alert(
-          "Unable to save book."
-        );
-      } finally {
-        setSaving(false);
-      }
+    const payload = {
+      title: form.title.trim(),
+      description: form.description.trim(),
+      originalPrice,
+      discountPercent,
+      price: Number(finalPrice.toFixed(2)),
+      stock: Number(form.stock),
+      language: form.language,
+      subject: form.subject,
+      coverImageUrl: form.coverImageUrl.trim(),
+      isActive: form.isActive,
+      mediums: form.mediums.map((medium) => ({ medium })),
     };
 
-  const deactivateBook =
-    async (book) => {
-      const confirmed =
-        window.confirm(
-          `Deactivate "${book.title}"?`
-        );
+    try {
+      setSaving(true);
 
-      if (!confirmed) {
-        return;
+      const url = editingId
+        ? `${API_URL}/books/${editingId}`
+        : `${API_URL}/books`;
+
+      const response = await fetch(url, {
+        method: editingId ? "PUT" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(await response.text());
       }
 
-      try {
-        const response =
-          await fetch(
-            `${API_URL}/books/${book.id}`,
-            {
-              method: "DELETE",
-            }
-          );
+      await fetchBooks();
+      resetForm();
+    } catch (error) {
+      console.error(error);
+      alert("Unable to save book.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
-        if (!response.ok) {
-          throw new Error(
-            "Deactivate failed"
-          );
+  const deactivateBook = async (book) => {
+    const confirmed = window.confirm(
+      `Deactivate "${book.title}"?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${API_URL}/books/${book.id}`,
+        {
+          method: "DELETE",
         }
+      );
 
-        await fetchBooks();
-
-      } catch (error) {
-        console.error(error);
-
-        alert(
-          "Unable to deactivate book."
-        );
+      if (!response.ok) {
+        throw new Error("Deactivate failed");
       }
-    };
 
-  const reactivateBook =
-    async (book) => {
-      const mediums =
-        Array.isArray(
-          book.mediums
-        )
-          ? book.mediums
-              .map((item) => ({
-                medium:
-                  typeof item === "string"
-                    ? item
-                    : item?.medium,
-              }))
-              .filter(
-                (item) =>
-                  item.medium
-              )
-          : [];
+      await fetchBooks();
+    } catch (error) {
+      console.error(error);
+      alert("Unable to deactivate book.");
+    }
+  };
 
-      const payload = {
-        title:
-          book.title || "",
-
-        description:
-          book.description || "",
-
-        originalPrice:
-          Number(
-            book.originalPrice ??
-              book.price ??
-              0
-          ),
-
-        discountPercent:
-          Number(
-            book.discountPercent ?? 0
-          ),
-
-        price:
-          Number(
-            book.price ?? 0
-          ),
-
-        stock:
-          Number(
-            book.stock ?? 0
-          ),
-
-        language:
-          book.language ||
-          "ENGLISH",
-
-        subject:
-          book.subject ||
-          "ARITHMETIC",
-
-        coverImageUrl:
-          book.coverImageUrl || "",
-
-        isActive: true,
-
-        mediums,
-      };
-
-      try {
-        const response =
-          await fetch(
-            `${API_URL}/books/${book.id}`,
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type":
-                  "application/json",
-              },
-              body:
-                JSON.stringify(
-                  payload
-                ),
-            }
-          );
-
-        if (!response.ok) {
-          throw new Error(
-            "Reactivate failed"
-          );
+  const reactivateBook = async (book) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/books/${book.id}/reactivate`,
+        {
+          method: "PUT",
         }
+      );
 
-        await fetchBooks();
-
-      } catch (error) {
-        console.error(error);
-
-        alert(
-          "Unable to reactivate book."
-        );
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Reactivate failed");
       }
-    };
+
+      await fetchBooks();
+    } catch (error) {
+      console.error(error);
+      alert("Unable to reactivate book.");
+    }
+  };
 
   return (
     <div className="admin-page">
-
       <div className="admin-header">
         <div>
-          <p className="section-tag">
-            BRUNDAVAN PUBLICATIONS
-          </p>
-
-          <h1>
-            Admin Dashboard
-          </h1>
-
+          <p className="section-tag">BRUNDAVAN PUBLICATIONS</p>
+          <h1>Admin Dashboard</h1>
           <p>
-            Manage books, prices,
-            offers, stock and mediums.
+            Manage books, prices, offers, stock and mediums.
           </p>
         </div>
 
         <div className="admin-header-actions">
-
           <Link
             to="/admin/orders"
             className="secondary-btn"
@@ -485,35 +254,21 @@ function AdminDashboard() {
                 return;
               }
 
-              setForm({
-                ...EMPTY_FORM,
-                mediums: [],
-              });
-
+              setForm({ ...EMPTY_FORM, mediums: [] });
               setEditingId(null);
               setShowForm(true);
             }}
           >
-            {showForm
-              ? "Close Form"
-              : "+ Add Book"}
+            {showForm ? "Close Form" : "+ Add Book"}
           </button>
-
         </div>
       </div>
 
       {showForm && (
         <div className="admin-form-card">
+          <h2>{editingId ? "Edit Book" : "Add New Book"}</h2>
 
-          <h2>
-            {editingId
-              ? "Edit Book"
-              : "Add New Book"}
-          </h2>
-
-          <form
-            onSubmit={saveBook}
-          >
+          <form onSubmit={saveBook}>
             <input
               type="text"
               name="title"
@@ -554,10 +309,7 @@ function AdminDashboard() {
             />
 
             <div className="calculated-price">
-              Final Price:
-              <strong>
-                ₹{calculatePrice()}
-              </strong>
+              Final Price: <strong>₹{calculatePrice()}</strong>
             </div>
 
             <input
@@ -583,12 +335,8 @@ function AdminDashboard() {
               value={form.language}
               onChange={handleChange}
             >
-              <option value="ENGLISH">
-                English
-              </option>
-              <option value="KANNADA">
-                Kannada
-              </option>
+              <option value="ENGLISH">English</option>
+              <option value="KANNADA">Kannada</option>
             </select>
 
             <select
@@ -596,66 +344,40 @@ function AdminDashboard() {
               value={form.subject}
               onChange={handleChange}
             >
-              <option value="ARITHMETIC">
-                Arithmetic
-              </option>
-
-              <option value="MENTAL_ABILITY">
-                Mental Ability
-              </option>
-
-              <option value="PASSAGES">
-                Passages
-              </option>
-
-              <option value="ANKAGANITH">
-                Ankaganith
-              </option>
+              <option value="ARITHMETIC">Arithmetic</option>
+              <option value="MENTAL_ABILITY">Mental Ability</option>
+              <option value="PASSAGES">Passages</option>
+              <option value="ANKAGANITH">Ankaganith</option>
             </select>
 
             <div className="medium-checkboxes">
-              <h3>
-                Available Mediums
-              </h3>
+              <h3>Available Mediums</h3>
 
-              {MEDIUMS.map(
-                (medium) => (
-                  <label key={medium}>
-                    <input
-                      type="checkbox"
-                      checked={form.mediums.includes(
-                        medium
-                      )}
-                      onChange={() =>
-                        handleMediumChange(
-                          medium
-                        )
-                      }
-                    />
-
-                    {medium}
-                  </label>
-                )
-              )}
+              {MEDIUMS.map((medium) => (
+                <label key={medium}>
+                  <input
+                    type="checkbox"
+                    checked={form.mediums.includes(medium)}
+                    onChange={() =>
+                      handleMediumChange(medium)
+                    }
+                  />
+                  {medium}
+                </label>
+              ))}
             </div>
 
             <label>
               <input
                 type="checkbox"
                 name="isActive"
-                checked={
-                  form.isActive
-                }
-                onChange={
-                  handleChange
-                }
+                checked={form.isActive}
+                onChange={handleChange}
               />
-
               Active
             </label>
 
             <div className="form-buttons">
-
               <button
                 type="submit"
                 className="primary-btn"
@@ -672,106 +394,67 @@ function AdminDashboard() {
                 <button
                   type="button"
                   className="secondary-btn"
-                  onClick={
-                    resetForm
-                  }
+                  onClick={resetForm}
                 >
                   Cancel
                 </button>
               )}
-
             </div>
           </form>
         </div>
       )}
 
       <div className="admin-books">
-
-        <h2>
-          Books
-        </h2>
+        <h2>Books</h2>
 
         {loading ? (
-          <p>
-            Loading books...
-          </p>
+          <p>Loading books...</p>
         ) : (
           <div className="admin-books-grid">
-
             {books.map((book) => {
-
-              const mediums =
-                Array.isArray(
-                  book.mediums
-                )
-                  ? book.mediums
-                      .map(
-                        (item) =>
-                          typeof item ===
-                          "string"
-                            ? item
-                            : item?.medium
-                      )
-                      .filter(Boolean)
-                  : [];
+              const mediums = Array.isArray(book.mediums)
+                ? book.mediums
+                    .map((item) =>
+                      typeof item === "string"
+                        ? item
+                        : item?.medium
+                    )
+                    .filter(Boolean)
+                : [];
 
               return (
                 <div
                   className="admin-book-card"
                   key={book.id}
                 >
-                  <h3>
-                    {book.title}
-                  </h3>
+                  <h3>{book.title}</h3>
 
                   <p>
                     Price: ₹
-                    {Number(
-                      book.price || 0
-                    ).toFixed(2)}
+                    {Number(book.price || 0).toFixed(2)}
                   </p>
 
-                  <p>
-                    Stock:{" "}
-                    {book.stock}
-                  </p>
-
-                  <p>
-                    Language:{" "}
-                    {book.language}
-                  </p>
-
-                  <p>
-                    Subject:{" "}
-                    {book.subject}
-                  </p>
+                  <p>Stock: {book.stock}</p>
+                  <p>Language: {book.language}</p>
+                  <p>Subject: {book.subject}</p>
 
                   <p>
                     Status:{" "}
-                    {book.isActive
-                      ? "Active"
-                      : "Inactive"}
+                    {book.isActive ? "Active" : "Inactive"}
                   </p>
 
                   <p>
                     Mediums:{" "}
                     {mediums.length
-                      ? mediums.join(
-                          ", "
-                        )
+                      ? mediums.join(", ")
                       : "None"}
                   </p>
 
                   <div className="card-buttons">
-
                     <button
                       type="button"
                       className="primary-btn"
-                      onClick={() =>
-                        startEdit(
-                          book
-                        )
-                      }
+                      onClick={() => startEdit(book)}
                     >
                       Edit
                     </button>
@@ -781,9 +464,7 @@ function AdminDashboard() {
                         type="button"
                         className="remove-btn"
                         onClick={() =>
-                          deactivateBook(
-                            book
-                          )
+                          deactivateBook(book)
                         }
                       >
                         Deactivate
@@ -793,20 +474,16 @@ function AdminDashboard() {
                         type="button"
                         className="secondary-btn"
                         onClick={() =>
-                          reactivateBook(
-                            book
-                          )
+                          reactivateBook(book)
                         }
                       >
                         Reactivate
                       </button>
                     )}
-
                   </div>
                 </div>
               );
             })}
-
           </div>
         )}
       </div>

@@ -12,6 +12,7 @@ import java.util.List;
 @RequestMapping("/api/books")
 @CrossOrigin(
     origins = {
+        "http://localhost:5173",
         "http://localhost:5174",
         "http://localhost:5175"
     }
@@ -47,6 +48,13 @@ public class BookController {
     public ResponseEntity<Book> createBook(
             @RequestBody Book book
     ) {
+
+        if (book.getMediums() != null) {
+            for (BookMedium medium : book.getMediums()) {
+                medium.setBook(book);
+            }
+        }
+
         Book savedBook =
                 bookRepository.save(book);
 
@@ -103,14 +111,18 @@ public class BookController {
                             updatedBook.getIsActive()
                     );
 
-                    existingBook.setMediums(
-                            updatedBook.getMediums()
-                    );
+                    // FIX: properly attach every medium to the existing book
+                    existingBook.getMediums().clear();
+
+                    if (updatedBook.getMediums() != null) {
+                        for (BookMedium medium : updatedBook.getMediums()) {
+                            medium.setBook(existingBook);
+                            existingBook.getMediums().add(medium);
+                        }
+                    }
 
                     Book savedBook =
-                            bookRepository.save(
-                                    existingBook
-                            );
+                            bookRepository.save(existingBook);
 
                     return ResponseEntity.ok(savedBook);
                 })
@@ -135,6 +147,27 @@ public class BookController {
                     return ResponseEntity
                             .noContent()
                             .<Void>build();
+                })
+                .orElseGet(() ->
+                        ResponseEntity.notFound().build()
+                );
+    }
+
+    // REACTIVATE book
+    @PutMapping("/{id}/reactivate")
+    public ResponseEntity<Book> reactivateBook(
+            @PathVariable Long id
+    ) {
+
+        return bookRepository.findById(id)
+                .map(book -> {
+
+                    book.setIsActive(true);
+
+                    Book savedBook =
+                            bookRepository.save(book);
+
+                    return ResponseEntity.ok(savedBook);
                 })
                 .orElseGet(() ->
                         ResponseEntity.notFound().build()
