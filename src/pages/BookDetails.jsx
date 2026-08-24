@@ -2,9 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import arithmeticImage from "../assets/books/Arithmetic.jpeg";
-import mentalAbilityImage from "../assets/books/Mental-Ability.jpeg";
-import passageImage from "../assets/books/Passage.jpeg";
-
+import mentalAbilityImage from "../assets/books/mental-ability.jpeg";
+import passageImage from "../assets/books/passage.jpeg";
 const API_URL = "https://brundavan-publications-production.up.railway.app/api";
 
 function BookDetails() {
