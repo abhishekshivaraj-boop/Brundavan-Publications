@@ -392,28 +392,18 @@ The application uses a premium visual style based on:
 * Book-cover-focused presentation
 
 ## Screenshots
-
-Add screenshots here after the final UI and deployment are complete.
-
 Suggested screenshots:
-
 ```text
-1. Home page
+1. Home page:
+![image alt](https://github.com/abhishekshivaraj-boop/Brundavan-Publications/blob/41fa500f070189069a69672599a790d01189b5c9/Screenshot%202026-08-30%20162920.png![image alt](image url)![image alt])
 2. Books catalog
+![image alt]https://github.com/abhishekshivaraj-boop/Brundavan-Publications/blob/a77a887c048bc33a5abf70a04713dbe82c1786a5/Screenshot%202026-08-30%20163915.png
 3. Book details
 4. Cart
 5. Checkout / UPI payment
 6. Order success
 7. Admin dashboard
 8. Admin orders
-```
-
-Example:
-
-```markdown
-![Home Page](screenshots/home.png)
-![Books Page](screenshots/books.png)
-![Admin Dashboard](screenshots/admin-dashboard.png)
 ```
 
 ## Current Development Status
